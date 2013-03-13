@@ -19,8 +19,11 @@
 
 - (IBAction)playMusic:(id)sender;
 - (IBAction)pauseMusic:(id)sender;
+- (IBAction)nextSong:(id)sender;
+- (IBAction)previousSong:(id)sender;
 
 - (void)updateIndicator;
+- (void)stopUpdatingIndicator;
 
 
 @end
