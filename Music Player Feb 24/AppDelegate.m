@@ -8,15 +8,11 @@
 
 // TO DO: TABLE VIEW
 // TO DO: SEARCH
+// What does one normally expect a music player to search for?
+// Just music folder? All of music on computer?
 
 // ------What to do if it hits end of array?
 // ------Options: Nuke Indicator? Loop back to beginning?
-
-// ------Caution: bools for checking end and beginning of array
-// ------for nextSong and previousSong
-
-// What does one normally expect a music player to search for?
-// Just music folder? All of music on computer?
 // I expect it to stop when reaches end of directory while playing
 // but to loop if I hit previous/next buttons
 
@@ -32,11 +28,10 @@
     // Alternative: can use NSMetaQuery (ie Spotlight) to search all of computer
     //              instead of just /Music folder
     
-    // Use NSHomeDirectory to get the Music Directory
+    // Use NSHomeDirectory/FileManager/DirectoryEnumerator to get the Music Directory
+    // and all subfolders
     NSString *musicDir = [NSHomeDirectory() stringByAppendingPathComponent:  @"Music"];
-    // Create a File Manager
     NSFileManager *localFileManager = [[NSFileManager alloc] init];
-    // Create a Directory Enumerator using the above
     NSDirectoryEnumerator *dirEnum = [localFileManager enumeratorAtPath:musicDir];
     
     // Look through the Directory Enumerator
@@ -46,7 +41,7 @@
     while (file = [dirEnum nextObject]) {
         
         // This is where we need the UTI business
-        // so can look for more than just "mp3", all audio files
+        // so can look for more than just "mp3", should find all audio files
         CFStringRef fileExtension = (__bridge CFStringRef) [file pathExtension];
         CFStringRef fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension, NULL);
         
@@ -57,18 +52,13 @@
         
         CFRelease(fileUTI);
     }
-        
-    // This should search the folder and stash all the paths (of the file names) in the array
-    //self.myArray = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/Users/heather/Desktop/music" error:nil];
-    self.myArray = musicArray;
+    
+    // Set the array we created to the array in our Delegate
+    self.myMusicArray = musicArray;
     
     // Setup first song
     self.currentIndex = 0;
     [self setUpSong:self.currentIndex];
-    
-    // Set delegate for NSSound (declare <NSSoundDelegate> in AppDelegate.h)
-    //[self.ourBeats setDelegate:self]; // This is duplicate (setUpSong does this now)
-    // Now go implement sound:didFinishPlaying:
     
     // Force progress indicator to "determinate"
     [self.indicator setIndeterminate:FALSE];
@@ -77,25 +67,28 @@
 
 - (void)setUpSong:(int)cIndex {
     
+    // Stop current song & the indicator
+    // (Shouldn't break if these don't exist)
+    [self.ourBeats stop];
+    [self stopUpdatingIndicator];
+    
     // Set current index (due to play next/previous/continue)
-    // Check for Ends
-    if (cIndex == [self.myArray count]) {
-        // We have hit the end, time to go back to zero
+    if (cIndex == [self.myMusicArray count]) { 
+        // We have hit the end & gone beyond, time to go back to zero
         self.currentIndex = 0;
     } else if (cIndex < 0) {
-        // We've return to the beginning, time to go to the end
-        self.currentIndex = [self.myArray count] - 1;
+        // We've return to the beginning & gone beyond, time to go to the end
+        self.currentIndex = [self.myMusicArray count] - 1;
     } else {
         [self setCurrentIndex:cIndex];
     }
     
     // Setup NSSound with File
-    // NSString *startOfString = @"/Users/heather/Desktop/music/";
     NSString *startOfString = [NSHomeDirectory() stringByAppendingPathComponent:  @"Music"];
-    NSString *wholeString = [startOfString stringByAppendingPathComponent:[self.myArray objectAtIndex:self.currentIndex]];
+    NSString *wholeString = [startOfString stringByAppendingPathComponent:[self.myMusicArray objectAtIndex:self.currentIndex]];
     self.ourBeats = [[NSSound alloc] initWithContentsOfFile:wholeString byReference:YES];
     
-    // Set delegate, needs to be set for each new song
+    // Set delegate, needs to be set for each and every new song
     [self.ourBeats setDelegate:self];
     
 }
@@ -131,7 +124,6 @@
 - (IBAction)pauseMusic:(id)sender {
     
     [self.ourBeats pause];
-    
     // Tell the timer to stfu and go away
     [self stopUpdatingIndicator];
     
@@ -140,42 +132,22 @@
 
 - (IBAction)nextSong:(id)sender {
     
-    // Stop current song & the indicator
-    [self.ourBeats stop];
-    [self stopUpdatingIndicator];
-    
-    // Play next song (if not last object)
     [self setUpSong:self.currentIndex + 1];
     [self playMusic:nil];
-    
-    /*if (self.currentIndex != ([self.myArray count] - 1)) { // NEED TO FIX
-        [self setUpSong:self.currentIndex + 1];
-        [self playMusic:nil];
-    }*/
     
 }
 
 - (IBAction)previousSong:(id)sender {
     
-    // Stop current song & the indicator
-    [self.ourBeats stop];
-    [self stopUpdatingIndicator];
-    
-    // Play next song (if not last object)
     [self setUpSong:self.currentIndex - 1];
     [self playMusic:nil];
-    
-    /*if (self.currentIndex != 0) {
-        [self setUpSong:self.currentIndex - 1];
-        [self playMusic:nil];
-    }*/
     
 }
 
 - (void)updateIndicator {
     
     // Increment by 1 second since max is set to duration
-    // so 1 second is 1% of the song
+    // so 1 second is equal to 1% of the song
     [self.indicator incrementBy:1.0];
     
     return;
@@ -194,22 +166,22 @@
     // Logic:
     // If YES then song finished, stop Timer & play next song
     // If NO song didn't finish, still need to stop Timer
-    
-    // Stop timer first
-    [self stopUpdatingIndicator];
-    
-    // Play next song
-    
-    // not last object
-    // && (self.currentIndex != ([self.myArray count] - 1))
-    if (aBool) { // if YES
+        
+    // If YES, Play next song
+    // && do not continue to play if at end of array
+    if (aBool && (self.currentIndex != ([self.myMusicArray count] - 1))) {
         [self setUpSong:self.currentIndex + 1];
         [self playMusic:nil]; // nil because IBAction
     }
     
     // Hide the bar when done playing
-    if (aBool && (self.currentIndex == ([self.myArray count] - 1))) {
+    if (aBool && (self.currentIndex == ([self.myMusicArray count] - 1))) {
         [self.indicator setHidden:YES];
+    }
+    
+    if (!aBool) {
+        // Stop timer first
+        [self stopUpdatingIndicator];
     }
 }
 

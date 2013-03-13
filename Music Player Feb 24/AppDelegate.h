@@ -14,7 +14,7 @@
 @property (strong) NSSound *ourBeats;
 @property (strong) IBOutlet NSProgressIndicator *indicator;
 @property (strong) NSTimer *timer;
-@property (strong) NSArray *myArray;
+@property (strong) NSArray *myMusicArray;
 @property int currentIndex;
 
 - (IBAction)playMusic:(id)sender;
