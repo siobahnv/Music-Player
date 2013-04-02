@@ -6,7 +6,6 @@
 //  Copyright (c) 2013 Heather Ransome. All rights reserved.
 //
 
-// TO DO: TABLE VIEW
 // TO DO: SEARCH
 // What does one normally expect a music player to search for?
 // Just music folder? All of music on computer?
@@ -15,6 +14,10 @@
 // ------Options: Nuke Indicator? Loop back to beginning?
 // I expect it to stop when reaches end of directory while playing
 // but to loop if I hit previous/next buttons
+
+// TO DO (Optional): Shuffle Button (Random)
+// TO DO (Optional): Total Count (easy peasy, [array count])
+
 
 #import "AppDelegate.h"
 
@@ -30,7 +33,7 @@
     
     // Use NSHomeDirectory/FileManager/DirectoryEnumerator to get the Music Directory
     // and all subfolders
-    NSString *musicDir = [NSHomeDirectory() stringByAppendingPathComponent:  @"Music"];
+    NSString *musicDir = [NSHomeDirectory() stringByAppendingPathComponent: @"Music"];
     NSFileManager *localFileManager = [[NSFileManager alloc] init];
     NSDirectoryEnumerator *dirEnum = [localFileManager enumeratorAtPath:musicDir];
     
@@ -55,14 +58,27 @@
     
     // Set the array we created to the array in our Delegate
     self.myMusicArray = musicArray;
+    self.arrayToDisplay = self.myMusicArray;
+    
+    // Tell the Table View to reload itself now that we have the Array
+    [self.myTable reloadData];
+    
+    // Turn off multiple selection (can also do this in IB)
+    // Also turned off "Editable" for Columns in IBe
+    [self.myTable setAllowsMultipleSelection:NO];
     
     // Setup first song
-    self.currentIndex = 0;
-    [self setUpSong:self.currentIndex];
+    //self.currentIndex = 0;
+    //[self setUpSong:self.currentIndex];
+    
+    // Connecting the table view
+    // setDoubleAction & clickedRow
+    //self.currentIndex = [self.myTable clickedRow];
+    [self.myTable setDoubleAction:@selector(playButton:)];
     
     // Force progress indicator to "determinate"
     [self.indicator setIndeterminate:FALSE];
-    
+        
 }
 
 - (void)setUpSong:(int)cIndex {
@@ -73,19 +89,19 @@
     [self stopUpdatingIndicator];
     
     // Set current index (due to play next/previous/continue)
-    if (cIndex == [self.myMusicArray count]) { 
+    if (cIndex == [self.arrayToDisplay count]) {
         // We have hit the end & gone beyond, time to go back to zero
         self.currentIndex = 0;
     } else if (cIndex < 0) {
         // We've return to the beginning & gone beyond, time to go to the end
-        self.currentIndex = [self.myMusicArray count] - 1;
+        self.currentIndex = [self.arrayToDisplay count] - 1;
     } else {
         [self setCurrentIndex:cIndex];
     }
     
     // Setup NSSound with File
     NSString *startOfString = [NSHomeDirectory() stringByAppendingPathComponent:  @"Music"];
-    NSString *wholeString = [startOfString stringByAppendingPathComponent:[self.myMusicArray objectAtIndex:self.currentIndex]];
+    NSString *wholeString = [startOfString stringByAppendingPathComponent:[self.arrayToDisplay objectAtIndex:self.currentIndex]];
     self.ourBeats = [[NSSound alloc] initWithContentsOfFile:wholeString byReference:YES];
     
     // Set delegate, needs to be set for each and every new song
@@ -93,7 +109,9 @@
     
 }
 
-- (IBAction)playMusic:(id)sender {
+- (void)playMusic {
+    
+    [self setUpSong:self.currentIndex];
     
     // Tell it to play if it hasn't already been told
     if (![self.ourBeats resume]) {
@@ -121,27 +139,61 @@
     return;
 }
 
+- (IBAction)playButton:(id)sender { // button implements whether row or first song to play
+    
+    if ([self.myTable selectedRow] < 0) { // selectedRow returns -1
+        self.currentIndex = 0;
+    } else {
+        self.currentIndex = [self.myTable selectedRow];
+    }
+    
+    [self playMusic];
+}
+
 - (IBAction)pauseMusic:(id)sender {
     
     [self.ourBeats pause];
     // Tell the timer to stfu and go away
     [self stopUpdatingIndicator];
     
-    return;
 }
 
 - (IBAction)nextSong:(id)sender {
     
-    [self setUpSong:self.currentIndex + 1];
-    [self playMusic:nil];
+    //[self setUpSong:self.currentIndex + 1];
+    self.currentIndex++;
+    [self playMusic];
     
 }
 
 - (IBAction)previousSong:(id)sender {
     
-    [self setUpSong:self.currentIndex - 1];
-    [self playMusic:nil];
+    //[self setUpSong:self.currentIndex - 1];
+    self.currentIndex--;
+    [self playMusic];
     
+}
+
+- (IBAction)updateSearchResults:(id)sender { // "Searches Immediately" is checkmarked in the Attributes Inspector
+        
+    NSString *searchString = [self.searchField stringValue]; // Grabbing the input text to search for
+    
+    if ((searchString != nil) && (![searchString isEqualToString:@""])) {
+        
+        // Want the last compenent in the string, rather than the path name
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.lastPathComponent contains[cd] %@", searchString];
+        
+        // Filter array & update table view
+        self.searchResults = [self.myMusicArray filteredArrayUsingPredicate:predicate];
+        self.arrayToDisplay = self.searchResults;
+        [self.myTable reloadData];
+        
+    } else { // Do I need an else? Yes
+        
+        self.arrayToDisplay = self.myMusicArray;
+        [self.myTable reloadData];
+        
+    }
 }
 
 - (void)updateIndicator {
@@ -170,8 +222,9 @@
     // If YES, Play next song
     // && do not continue to play if at end of array
     if (aBool && (self.currentIndex != ([self.myMusicArray count] - 1))) {
-        [self setUpSong:self.currentIndex + 1];
-        [self playMusic:nil]; // nil because IBAction
+        //[self setUpSong:self.currentIndex + 1];
+        self.currentIndex++;
+        [self playMusic];
     }
     
     // Hide the bar when done playing
@@ -180,9 +233,29 @@
     }
     
     if (!aBool) {
-        // Stop timer first
+        // Stop timer 
         [self stopUpdatingIndicator];
     }
+}
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
+    
+    NSInteger count = 0;
+    
+    if (self.arrayToDisplay) {
+        count = [self.arrayToDisplay count];
+    }
+    
+    return count;
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
+    
+    id returnValue = nil;
+    NSString *theName = [self.arrayToDisplay objectAtIndex:row];
+    returnValue = [theName lastPathComponent];
+    
+    return returnValue;
 }
 
 @end
