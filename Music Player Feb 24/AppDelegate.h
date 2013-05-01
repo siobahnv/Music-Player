@@ -14,12 +14,14 @@
 @property (strong) IBOutlet NSProgressIndicator *indicator;
 @property (weak) IBOutlet NSTableView *myTable;
 @property IBOutlet NSSearchField  *searchField;
+@property (weak) IBOutlet NSButton *shuffleButton;
+@property (weak) IBOutlet NSTextField *totalSongs;
 
 @property (strong) NSSound *ourBeats;
 @property (strong) NSTimer *timer;
-@property (strong) NSArray *myMusicArray;
-@property (strong) NSArray *searchResults;
-@property (strong) NSArray *arrayToDisplay;
+@property (strong) NSArray *myMusicArray; // Array of NSURLs
+@property (strong) NSArray *searchResults; // Made from myMusicArray, so Array of NSURLs
+@property (strong) NSArray *arrayToDisplay; // As above, Array of NSURLs
 @property int currentIndex;
 
 - (IBAction)playButton:(id)sender;
@@ -27,10 +29,12 @@
 - (IBAction)nextSong:(id)sender;
 - (IBAction)previousSong:(id)sender;
 - (IBAction)updateSearchResults:(id)sender;
+- (IBAction)shuffleMusic:(id)sender;
 
 - (void)updateIndicator;
 - (void)stopUpdatingIndicator;
 - (void)playMusic;
+- (void)updateTotalSongsButton;
 
 
 @end
