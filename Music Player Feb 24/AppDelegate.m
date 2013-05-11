@@ -17,9 +17,10 @@
 // pretty sure it just loops and never stops)
 
 // Potentially create a separate Music class
-// TO DO (Optional): There are probably duplicates in the array of songs, could try handling that?
+// TO DO (Optional): There are probably duplicates in the array of songs, could try handling that? Fixed?
 // TO DO (Optional): Playlists?
-// TO DO (Optional): Sort? Sort by Album? by Rating?
+// ****TO DO: Sort? Sort by Album? by Rating?****
+// ****TO DO: Fix Search *****
 
 // Useful things:
 // mediaItem.title
@@ -41,10 +42,15 @@
 // @property (readonly, nonatomic, retain) NSArray* items;
 
 
+// TO DO: fix search (what do I want it to search anyways?)
+// TO DO: add sort, thinking those column arrow thingies?
+
 
 #import "AppDelegate.h"
 #import <iTunesLibrary/ITLibrary.h>
 #import <iTunesLibrary/ITLibMediaItem.h>
+#import <iTunesLibrary/ITLibAlbum.h>
+#import <iTunesLibrary/ITLibArtist.h>
 
 @implementation AppDelegate
 
@@ -54,41 +60,6 @@
     // What does one normally expect a music player to search for?
     // Just music folder? All of music on computer?
     // I have it searching for all music in the "Music" directory
-    // ------------------------------------------------------------------------------------------
-    
-    /*// Proper searching of a directory
-    // Reference: http://stackoverflow.com/questions/5814463/get-the-type-of-a-file-in-cocoa
-    // Alternative: can use NSMetaQuery (ie Spotlight) to search all of computer
-    //              instead of just /Music folder
-    
-    // Use NSHomeDirectory/FileManager/DirectoryEnumerator to get the Music Directory
-    // and all subfolders
-    NSString *musicDir = [NSHomeDirectory() stringByAppendingPathComponent: @"Music"];
-    NSFileManager *localFileManager = [[NSFileManager alloc] init];
-    NSDirectoryEnumerator *dirEnum = [localFileManager enumeratorAtPath:musicDir];
-    
-    // Look through the Directory Enumerator
-    // And store what we want in a Mutable Array
-    NSString *file;
-    NSMutableArray *musicArray = [NSMutableArray array];
-    while (file = [dirEnum nextObject]) {
-        
-        // This is where we need the UTI business
-        // so can look for more than just "mp3", should find all audio files
-        CFStringRef fileExtension = (__bridge CFStringRef) [file pathExtension];
-        CFStringRef fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension, NULL);
-        
-        // If it's an audio file, stache it in our array
-        if (UTTypeConformsTo(fileUTI, kUTTypeAudio)) {
-            [musicArray addObject:file];
-        }
-        
-        CFRelease(fileUTI);
-    }
-    
-    // Store and display the array we created
-    self.myMusicArray = musicArray;
-    self.arrayToDisplay = self.myMusicArray; */
     // ------------------------------------------------------------------------------------------
     
     // #1: Added iTunes library framework, need to use Shift+Cmd+G to find
@@ -112,21 +83,15 @@
                 
                 ITLibMediaItem *mediaItem = (ITLibMediaItem*)[tracks objectAtIndex:i];
                 
-                // if (mediaItem.mediaKind == ITLibMediaItemMediaKindSong) { // Returning kind "Unknown" for known music files
-                //     [musicArray addObject:mediaItem.location]; // Array of NSURLs
-                //     NSLog(@"%@", mediaItem.title);
-                // }
-                
-                // This is where we need the UTI business
-                // so can look for more than just "mp3", should find all audio files
-                // NSString *file; // But we have URLs, not NSStrings
-                // CFStringRef fileExtension = (__bridge CFStringRef) [file pathExtension];
+                // Reference: http://stackoverflow.com/questions/5814463/get-the-type-of-a-file-in-cocoa
                 CFStringRef fileExtension = (__bridge CFStringRef) [mediaItem.location pathExtension];
                 CFStringRef fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension, NULL);
                 
                 // If it's an audio file, stache it in our array
                 if (UTTypeConformsTo(fileUTI, kUTTypeAudio)) {
-                    [musicArray addObject:mediaItem.location]; // Arrays of NSURLs
+                    //[musicArray addObject:mediaItem.location]; // Arrays of NSURLs
+                    // But need to make array of mediaItems not NSURLs to access metadata
+                    [musicArray addObject:mediaItem]; // Around 265 items
                 }
                 
                 CFRelease(fileUTI);
@@ -134,19 +99,11 @@
             }
             
             // Store and display the array
-            // self.myMusicArray = tracks;
             self.myMusicArray = musicArray;
             self.arrayToDisplay = self.myMusicArray;
             
         }
-        
-        /*if (tracks.count > 0) {
-            
-            // Get the location (URL) of the first media item and prepare it for file read/write access.
-            ITLibMediaItem *mediaItem = (ITLibMediaItem*)[tracks objectAtIndex:0];
-            NSLog(@"%@", mediaItem);
-         
-        }*/
+    
     }
 
     
@@ -160,7 +117,8 @@
     [self.myTable setAllowsMultipleSelection:NO];
     
     // Hide the Header in Table View (not necessary for such a Simple table)
-    [self.myTable setHeaderView:nil];
+    //[self.myTable setHeaderView:nil];
+    // Un-hid since using multiple columns now
     
     // Connecting the table view
     [self.myTable setDoubleAction:@selector(playButton:)];
@@ -189,11 +147,13 @@
     }
     
     // Setup NSSound with File
-    // NSString *startOfString = [NSHomeDirectory() stringByAppendingPathComponent:  @"Music"];
-    // NSString *wholeString = [startOfString stringByAppendingPathComponent:[self.arrayToDisplay objectAtIndex:self.currentIndex]];
-    // self.ourBeats = [[NSSound alloc] initWithContentsOfFile:wholeString byReference:YES];
-    self.ourBeats = [[NSSound alloc] initWithContentsOfURL:[self.arrayToDisplay objectAtIndex:self.currentIndex] byReference:YES];
-    // NEED TO DO WORK HERE!!! I think it works?
+    ITLibMediaItem *mediaItem = [self.arrayToDisplay objectAtIndex:self.currentIndex];
+    NSURL *mediaURL = mediaItem.location; // location should give us a NSURL
+    // Continuation of HACKS! since mediaItem.location is returning nil, we're going to search for the property
+    if (!mediaURL) {
+        mediaURL = [mediaItem valueForProperty:@"Location"]; // but if it doesn't, fall back to querying the property directly
+    }
+    self.ourBeats = [[NSSound alloc] initWithContentsOfURL:mediaURL byReference:YES];
     
     // Set delegate, needs to be set for each and every new song
     [self.ourBeats setDelegate:self];
@@ -263,13 +223,18 @@
 }
 
 - (IBAction)updateSearchResults:(id)sender { // "Searches Immediately" is checkmarked in the Attributes Inspector
+    
+    // TO DO: Man I don't even want to touch this section...
+    // fix for array of media items instead of array of nsstrings
+    // fix for multiple columns in table view
         
     NSString *searchString = [self.searchField stringValue]; // Grabbing the input text to search for
     
     if ((searchString != nil) && (![searchString isEqualToString:@""])) {
         
         // Want the last component in the string, rather than the path name
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.lastPathComponent contains[cd] %@", searchString];
+        // NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.lastPathComponent contains[cd] %@", searchString];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.location.lastPathComponent contains[cd] %@", searchString];
         
         // Filter array & update table view
         self.searchResults = [self.myMusicArray filteredArrayUsingPredicate:predicate];
@@ -354,11 +319,32 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     
-    id returnValue = nil;
-    NSString *theName = [self.arrayToDisplay objectAtIndex:row];
-    returnValue = [theName lastPathComponent]; // Should I replace with mediaItem.title?
+    //id returnValue = nil;
+    // NSString *theName = [self.arrayToDisplay objectAtIndex:row];
+    // returnValue = [theName lastPathComponent]; // Should I replace with mediaItem.title?
+    ITLibMediaItem *mediaItem = [self.arrayToDisplay objectAtIndex:row]; // Stash your media item in a media item
+    //returnValue = mediaItem.title;
     
-    return returnValue;
+    // NSString *identifier = [column identifier];
+    // return [[myArray objectAtIndex:row] objectForKey:[tableColumn identifier]];
+    
+    id value = nil;
+    
+    if ([[tableColumn identifier] isEqualToString:@"Title"]) {
+        value = mediaItem.title;
+    } else if ([[tableColumn identifier] isEqualToString:@"Album"]) {
+        if (mediaItem.album.title) {
+            value = mediaItem.album.title;
+            //NSLog(@"@%", mediaItem.album);
+        }
+    } else if ([[tableColumn identifier] isEqualToString:@"Artist"]) {
+        if (mediaItem.artist.name) {
+            value = mediaItem.artist.name;
+        }
+    }
+    
+    return value;
+    
 }
 
 @end

@@ -13,15 +13,16 @@
 @property (assign) IBOutlet NSWindow *window;
 @property (strong) IBOutlet NSProgressIndicator *indicator;
 @property (weak) IBOutlet NSTableView *myTable;
+// Check marked "Alternating Rows" in IB to get different color rows
 @property IBOutlet NSSearchField  *searchField;
 @property (weak) IBOutlet NSButton *shuffleButton;
 @property (weak) IBOutlet NSTextField *totalSongs;
 
 @property (strong) NSSound *ourBeats;
 @property (strong) NSTimer *timer;
-@property (strong) NSArray *myMusicArray; // Array of NSURLs
-@property (strong) NSArray *searchResults; // Made from myMusicArray, so Array of NSURLs
-@property (strong) NSArray *arrayToDisplay; // As above, Array of NSURLs
+@property (strong) NSArray *myMusicArray; // Array of media items
+@property (strong) NSArray *searchResults; // Made from myMusicArray, so Array of media items
+@property (strong) NSArray *arrayToDisplay; // As above, Array of media items
 @property int currentIndex;
 
 - (IBAction)playButton:(id)sender;
