@@ -25,14 +25,19 @@
 @property (strong) NSArray *arrayToDisplay; // As above, Array of media items
 @property int currentIndex;
 
+@property int searchCategory;
+
 - (IBAction)playButton:(id)sender;
 - (IBAction)pauseMusic:(id)sender;
 - (IBAction)nextSong:(id)sender;
 - (IBAction)previousSong:(id)sender;
+
 - (IBAction)updateSearchResults:(id)sender;
 - (IBAction)shuffleMusic:(id)sender;
 
+- (IBAction)setSearchCategoryFrom:(NSMenuItem *)sender;
 - (void)updateIndicator;
+
 - (void)stopUpdatingIndicator;
 - (void)playMusic;
 - (void)updateTotalSongsButton;

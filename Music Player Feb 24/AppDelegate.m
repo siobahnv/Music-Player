@@ -7,14 +7,8 @@
 //
 
 // Simple Music Player using NSString
-// Switching to NSURL?
+// Switching to NSURL to ITMediaItem
 // so can implement Albums & Sorting and AV crap
-
-// ------What to do if it hits end of array?
-// ------Options: Nuke Indicator? Loop back to beginning?
-// I expect it to stop when reaches end of directory while playing
-// but to loop if I hit previous/next buttons (did not implement this,
-// pretty sure it just loops and never stops)
 
 // Potentially create a separate Music class
 // TO DO (Optional): There are probably duplicates in the array of songs, could try handling that? Fixed?
@@ -22,25 +16,10 @@
 // ****TO DO: Sort? Sort by Album? by Rating?****
 // ****TO DO: Fix Search *****
 
-// Useful things:
-// mediaItem.title
-// mediaItem.sortTitle
-// mediaItem.album
-// mediaItem.artist
-
 // Useful later:
 // mediaItem.contentRating
 // mediaItem.description
 // mediaItem.genre
-
-// Alternative path to allmediaitems:
-// NSArray *playlists = library.allPlaylists; //  <- NSArray of ITLibPlaylist // This returns 18 objects
-//
-// items (playlists.items)
-// The media items (tracks) in this playlist. (read-only)
-//
-// @property (readonly, nonatomic, retain) NSArray* items;
-
 
 // TO DO: fix search (what do I want it to search anyways?)
 // TO DO: add sort, thinking those column arrow thingies?
@@ -56,12 +35,6 @@
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    // ------------------------------------------------------------------------------------------
-    // What does one normally expect a music player to search for?
-    // Just music folder? All of music on computer?
-    // I have it searching for all music in the "Music" directory
-    // ------------------------------------------------------------------------------------------
-    
     // #1: Added iTunes library framework, need to use Shift+Cmd+G to find
     // Went to Project in the left bar > Targets > Build Phases > Link Binary with Libraries > + > Add Other > Shift+Cmd+G > /Library/Frameworks > iTunesLibrary.frameworks
     // #2: But that was not enough, needed to do this as well for it to Build
@@ -89,8 +62,6 @@
                 
                 // If it's an audio file, stache it in our array
                 if (UTTypeConformsTo(fileUTI, kUTTypeAudio)) {
-                    //[musicArray addObject:mediaItem.location]; // Arrays of NSURLs
-                    // But need to make array of mediaItems not NSURLs to access metadata
                     [musicArray addObject:mediaItem]; // Around 265 items
                 }
                 
@@ -105,7 +76,6 @@
         }
     
     }
-
     
     // Tell the Table View to reload itself now that we have the Array
     [self.myTable reloadData];
@@ -116,15 +86,14 @@
     // Also turned off "Editable" for Columns in IB
     [self.myTable setAllowsMultipleSelection:NO];
     
-    // Hide the Header in Table View (not necessary for such a Simple table)
-    //[self.myTable setHeaderView:nil];
-    // Un-hid since using multiple columns now
-    
     // Connecting the table view
     [self.myTable setDoubleAction:@selector(playButton:)];
     
     // Force progress indicator to "determinate"
     [self.indicator setIndeterminate:FALSE];
+    
+    // Set default search to Title which is tagged with "1"
+    //[self setSearchCategory:1];
         
 }
 
@@ -222,25 +191,69 @@
     
 }
 
+- (IBAction)setSearchCategoryFrom:(NSMenuItem *)sender {
+    self.searchCategory = [sender tag];
+    [[self.searchField cell] setPlaceholderString:[sender title]];
+    
+}
+
 - (IBAction)updateSearchResults:(id)sender { // "Searches Immediately" is checkmarked in the Attributes Inspector
     
     // TO DO: Man I don't even want to touch this section...
     // fix for array of media items instead of array of nsstrings
     // fix for multiple columns in table view
-        
+    
     NSString *searchString = [self.searchField stringValue]; // Grabbing the input text to search for
+    NSPredicate *predicate;
     
     if ((searchString != nil) && (![searchString isEqualToString:@""])) {
         
         // Want the last component in the string, rather than the path name
         // NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.lastPathComponent contains[cd] %@", searchString];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.location.lastPathComponent contains[cd] %@", searchString];
+        // NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.location.lastPathComponent contains[cd] %@", searchString];
         
+        // Filter array & update table view
+        // self.searchResults = [self.myMusicArray filteredArrayUsingPredicate:predicate];
+        // self.arrayToDisplay = self.searchResults;
+        
+        /*if (self.searchCategory == 1) { // 1 should be Title
+            predicate = [NSPredicate predicateWithFormat:@"SELF.title contains[cd] %@", searchString];
+            // Filter array & update table view
+            self.searchResults = [self.myMusicArray filteredArrayUsingPredicate:predicate];
+            self.arrayToDisplay = self.searchResults;
+        }*/
+        
+        // NSString *itemString;
+        
+        switch (self.searchCategory) {
+            case 1: // Title Menu Item
+                // itemString = @"title";
+                predicate = [NSPredicate predicateWithFormat:@"SELF.title contains[cd] %@", searchString];
+                break;
+            case 2: // Album Menu Item
+                // itemString = @"album.title";
+                predicate = [NSPredicate predicateWithFormat:@"SELF.album.title contains[cd] %@", searchString];
+                break;
+            case 3: // Artist Menu Item
+                // itemString = @"artist.name";
+                predicate = [NSPredicate predicateWithFormat:@"SELF.artist.name contains[cd] %@", searchString];
+                break;
+            case 0: // All Menu Item
+            default:
+                // NSLog(@"Oops, defaulted. Please select a Menu Item to search.");
+                predicate = [NSPredicate predicateWithFormat:@"(SELF.title contains[cd] %@) OR (SELF.album.title contains[cd] %@) OR (SELF.artist.name contains[cd] %@)", searchString, searchString, searchString];
+                
+                // NSArray *argArray = [NSArray arrayWithObjects:@"SELF.title", @"SELF.album.title", @"SELF.artist.name", nil];
+                // predicate = [NSPredicate predicateWithFormat:<#(NSString *)#> argumentArray:<#(NSArray *)#>]
+                break;
+        }
+        
+        // predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF.%@ contains[cd] %%@", itemString], searchString];
         // Filter array & update table view
         self.searchResults = [self.myMusicArray filteredArrayUsingPredicate:predicate];
         self.arrayToDisplay = self.searchResults;
         
-    } else { // Do I need an else? Yes, resets the table 
+    } else { // Do I need an else? Yes, resets the table
         
         self.arrayToDisplay = self.myMusicArray;
         
@@ -275,8 +288,6 @@
 }
 
 - (void)updateTotalSongsButton {
-    
-    //self.totalSongs = [NSString stringWithFormat:@"%li", (unsigned long)self.arrayToDisplay.count];
     
     [self.totalSongs setStringValue: [NSString stringWithFormat:@"%li", (unsigned long)self.arrayToDisplay.count]];
     
@@ -319,15 +330,7 @@
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     
-    //id returnValue = nil;
-    // NSString *theName = [self.arrayToDisplay objectAtIndex:row];
-    // returnValue = [theName lastPathComponent]; // Should I replace with mediaItem.title?
     ITLibMediaItem *mediaItem = [self.arrayToDisplay objectAtIndex:row]; // Stash your media item in a media item
-    //returnValue = mediaItem.title;
-    
-    // NSString *identifier = [column identifier];
-    // return [[myArray objectAtIndex:row] objectForKey:[tableColumn identifier]];
-    
     id value = nil;
     
     if ([[tableColumn identifier] isEqualToString:@"Title"]) {
@@ -335,7 +338,6 @@
     } else if ([[tableColumn identifier] isEqualToString:@"Album"]) {
         if (mediaItem.album.title) {
             value = mediaItem.album.title;
-            //NSLog(@"@%", mediaItem.album);
         }
     } else if ([[tableColumn identifier] isEqualToString:@"Artist"]) {
         if (mediaItem.artist.name) {

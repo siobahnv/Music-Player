@@ -1775,7 +1775,6 @@
 							<string key="NSFrame">{{657, 21}, {45, 17}}</string>
 							<reference key="NSSuperview" ref="439893737"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:1535</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="382140166">
@@ -1870,6 +1869,46 @@
 					<int key="NSPeriodicInterval">25</int>
 				</object>
 				<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
+			</object>
+			<object class="NSMenu" id="579948681">
+				<string key="NSTitle">Search Menu</string>
+				<array class="NSMutableArray" key="NSMenuItems">
+					<object class="NSMenuItem" id="981533337">
+						<reference key="NSMenu" ref="579948681"/>
+						<string key="NSTitle">Title</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="35465992"/>
+						<reference key="NSMixedImage" ref="502551668"/>
+						<int key="NSTag">1</int>
+					</object>
+					<object class="NSMenuItem" id="638198089">
+						<reference key="NSMenu" ref="579948681"/>
+						<string key="NSTitle">Album</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="35465992"/>
+						<reference key="NSMixedImage" ref="502551668"/>
+						<int key="NSTag">2</int>
+					</object>
+					<object class="NSMenuItem" id="631754570">
+						<reference key="NSMenu" ref="579948681"/>
+						<string key="NSTitle">Artist</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="35465992"/>
+						<reference key="NSMixedImage" ref="502551668"/>
+						<int key="NSTag">3</int>
+					</object>
+					<object class="NSMenuItem" id="557968438">
+						<reference key="NSMenu" ref="579948681"/>
+						<string key="NSTitle">All</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="35465992"/>
+						<reference key="NSMixedImage" ref="502551668"/>
+					</object>
+				</array>
 			</object>
 		</array>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -2643,6 +2682,38 @@
 					<int key="connectionID">652</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setSearchCategoryFrom:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="981533337"/>
+					</object>
+					<int key="connectionID">666</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setSearchCategoryFrom:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="638198089"/>
+					</object>
+					<int key="connectionID">667</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setSearchCategoryFrom:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="631754570"/>
+					</object>
+					<int key="connectionID">668</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">setSearchCategoryFrom:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="557968438"/>
+					</object>
+					<int key="connectionID">670</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="177285573"/>
@@ -2657,6 +2728,14 @@
 						<reference key="destination" ref="976324537"/>
 					</object>
 					<int key="connectionID">613</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">searchMenuTemplate</string>
+						<reference key="source" ref="1017258984"/>
+						<reference key="destination" ref="579948681"/>
+					</object>
+					<int key="connectionID">665</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -4354,6 +4433,37 @@
 						<reference key="object" ref="605787419"/>
 						<reference key="parent" ref="622578850"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">661</int>
+						<reference key="object" ref="579948681"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="638198089"/>
+							<reference ref="981533337"/>
+							<reference ref="631754570"/>
+							<reference ref="557968438"/>
+						</array>
+						<reference key="parent" ref="0"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">662</int>
+						<reference key="object" ref="981533337"/>
+						<reference key="parent" ref="579948681"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">663</int>
+						<reference key="object" ref="638198089"/>
+						<reference key="parent" ref="579948681"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">664</int>
+						<reference key="object" ref="631754570"/>
+						<reference key="parent" ref="579948681"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">669</int>
+						<reference key="object" ref="557968438"/>
+						<reference key="parent" ref="579948681"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4593,6 +4703,11 @@
 				<string key="658.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="659.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="660.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="661.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="662.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="663.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="664.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="669.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="72.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="73.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="74.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4609,7 +4724,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">660</int>
+			<int key="maxID">670</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -4621,6 +4736,7 @@
 						<string key="pauseMusic:">id</string>
 						<string key="playButton:">id</string>
 						<string key="previousSong:">id</string>
+						<string key="setSearchCategoryFrom:">NSMenuItem</string>
 						<string key="shuffleMusic:">id</string>
 						<string key="updateSearchResults:">id</string>
 					</dictionary>
@@ -4640,6 +4756,10 @@
 						<object class="IBActionInfo" key="previousSong:">
 							<string key="name">previousSong:</string>
 							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setSearchCategoryFrom:">
+							<string key="name">setSearchCategoryFrom:</string>
+							<string key="candidateClassName">NSMenuItem</string>
 						</object>
 						<object class="IBActionInfo" key="shuffleMusic:">
 							<string key="name">shuffleMusic:</string>
