@@ -13,12 +13,9 @@
 // Potentially create a separate Music class
 // TO DO (Optional): There are probably duplicates in the array of songs, could try handling that? Fixed?
 // TO DO (Optional): Playlists?
-// ****TO DO: Sort? Sort by Album? by Rating?****
-// ****TO DO: Fix Search *****
-
-// TO DO: add sort, thinking those column arrow thingies?
-// Unchecked "Editable" in IB for each Column
-
+// ****TO DO: Fix Random Shuffle
+// To Do (Optional): Show & sort/filter by Ratings
+// To Do (Optional): Fix search box to stretch & shrink with window
 
 #import "AppDelegate.h"
 #import <iTunesLibrary/ITLibrary.h>
@@ -96,6 +93,11 @@
     [self.ourBeats stop];
     [self stopUpdatingIndicator];
     
+    // If Shuffle is Turned on, Need to play with the Index
+    if (self.shuffleMode) {
+        cIndex = arc4random_uniform(self.arrayToDisplay.count);
+    }
+    
     // Set current index (due to play next/previous/continue)
     // Due to shuffle + search sometimes the index will be greater than the array
     if (cIndex >= [self.arrayToDisplay count]) { 
@@ -111,15 +113,29 @@
     // Setup NSSound with File
     ITLibMediaItem *mediaItem = [self.arrayToDisplay objectAtIndex:self.currentIndex];
     NSURL *mediaURL = mediaItem.location; // location should give us a NSURL
+    
     // Continuation of HACKS! since mediaItem.location is returning nil, we're going to search for the property
     if (!mediaURL) {
         mediaURL = [mediaItem valueForProperty:@"Location"]; // but if it doesn't, fall back to querying the property directly
     }
+    
     self.ourBeats = [[NSSound alloc] initWithContentsOfURL:mediaURL byReference:YES];
     
     // Set delegate, needs to be set for each and every new song
     [self.ourBeats setDelegate:self];
     
+    // Highlight and Scroll to row? Appears to work
+    [self highlightAndScrollToCurrentSong];
+    
+}
+
+- (void)highlightAndScrollToCurrentSong { // Appears to work
+    
+    NSIndexSet *indexSet = [NSIndexSet indexSetWithIndex:self.currentIndex];
+    [self.myTable selectRowIndexes:indexSet byExtendingSelection:NO]; // Don't understand the wording here
+    
+    // Scroll to row
+    [self.myTable scrollRowToVisible:self.currentIndex];
 }
 
 - (void)playMusic {
@@ -223,7 +239,7 @@
         
     }
     
-    if (self.myTable.sortDescriptors) { // Fix Sort when Searching, hack?
+    if (self.myTable.sortDescriptors) { // Fixes Sort when Searching
         self.arrayToDisplay = [self.arrayToDisplay sortedArrayUsingDescriptors:self.myTable.sortDescriptors];
     }
     
@@ -235,8 +251,13 @@
 - (IBAction)shuffleMusic:(id)sender { // TO DO: NEED TO FIX RANDOM, ONLY RANDOM THE FIRST TIME
     
     // Set Button to "Push On Push Off" in IB
+    
+    // if ([self.shuffleButton state]) {
+    //     self.currentIndex = arc4random_uniform(self.arrayToDisplay.count);
+    // }
+    
     if ([self.shuffleButton state]) {
-        self.currentIndex = arc4random_uniform(self.arrayToDisplay.count);
+        self.shuffleMode = TRUE;
     }
 }
 
@@ -318,12 +339,10 @@
 }
 
 - (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray *)oldDescriptors  {
-    // Each table column has a Sort Key and Selector defined in IB along with Order Ascending selected.
     
+    // Each table column has a Sort Key and Selector defined in IB along with Order Ascending selected.
     NSArray *newDescriptors = tableView.sortDescriptors;
     self.arrayToDisplay = [self.arrayToDisplay sortedArrayUsingDescriptors:newDescriptors];
-    // self.myMusicArray = [self.myMusicArray sortedArrayUsingDescriptors:newDescriptors];
-    // self.arrayToDisplay = self.myMusicArray;
     [tableView reloadData];
     
 }

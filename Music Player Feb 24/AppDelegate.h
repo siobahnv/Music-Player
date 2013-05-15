@@ -5,6 +5,9 @@
 //  Created by Heather Ransome on 2/24/13.
 //  Copyright (c) 2013 Heather Ransome. All rights reserved.
 //
+// IB Actions:
+// Unchecked "Editable" in IB for each Column
+// Each table column has a Sort Key and Selector defined in IB along with Order Ascending selected.
 
 #import <Cocoa/Cocoa.h>
 
@@ -27,6 +30,8 @@
 
 @property int searchCategory;
 
+@property bool shuffleMode;
+
 - (IBAction)playButton:(id)sender;
 - (IBAction)pauseMusic:(id)sender;
 - (IBAction)nextSong:(id)sender;
@@ -41,6 +46,7 @@
 - (void)stopUpdatingIndicator;
 - (void)playMusic;
 - (void)updateTotalSongsButton;
+- (void)highlightAndScrollToCurrentSong;
 
 
 @end
