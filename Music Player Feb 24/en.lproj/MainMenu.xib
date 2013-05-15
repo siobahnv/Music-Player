@@ -1445,7 +1445,7 @@
 											<string key="NSFrameSize">{677, 287}</string>
 											<reference key="NSSuperview" ref="21932035"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="88540079"/>
+											<reference key="NSNextKeyView" ref="253483684"/>
 											<string key="NSReuseIdentifierKey">_NS:13</string>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -1525,10 +1525,15 @@
 													<int key="NSResizingMask">3</int>
 													<bool key="NSIsResizeable">YES</bool>
 													<reference key="NSTableView" ref="177285573"/>
+													<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
+														<string key="NSKey">self.title</string>
+														<bool key="NSAscending">YES</bool>
+														<string key="NSSelector">localizedCaseInsensitiveCompare:</string>
+													</object>
 												</object>
 												<object class="NSTableColumn" id="498079630">
 													<string key="NSIdentifier">Album</string>
-													<double key="NSWidth">117.28125</double>
+													<double key="NSWidth">200.15234375</double>
 													<double key="NSMinWidth">10</double>
 													<double key="NSMaxWidth">3.4028234663852886e+38</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -1558,12 +1563,16 @@
 													</object>
 													<int key="NSResizingMask">3</int>
 													<bool key="NSIsResizeable">YES</bool>
-													<bool key="NSIsEditable">YES</bool>
 													<reference key="NSTableView" ref="177285573"/>
+													<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
+														<string key="NSKey">self.album.title</string>
+														<bool key="NSAscending">YES</bool>
+														<string key="NSSelector">localizedCaseInsensitiveCompare:</string>
+													</object>
 												</object>
 												<object class="NSTableColumn" id="622578850">
 													<string key="NSIdentifier">Artist</string>
-													<double key="NSWidth">315</double>
+													<double key="NSWidth">232</double>
 													<double key="NSMinWidth">10</double>
 													<double key="NSMaxWidth">3.4028234663852886e+38</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -1585,8 +1594,12 @@
 													</object>
 													<int key="NSResizingMask">3</int>
 													<bool key="NSIsResizeable">YES</bool>
-													<bool key="NSIsEditable">YES</bool>
 													<reference key="NSTableView" ref="177285573"/>
+													<object class="NSSortDescriptor" key="NSSortDescriptorPrototype">
+														<string key="NSKey">self.artist.name</string>
+														<bool key="NSAscending">YES</bool>
+														<string key="NSSelector">localizedCaseInsensitiveCompare:</string>
+													</object>
 												</object>
 											</array>
 											<double key="NSIntercellSpacingWidth">3</double>
@@ -1670,7 +1683,7 @@
 							<string key="NSFrame">{{20, 72}, {679, 305}}</string>
 							<reference key="NSSuperview" ref="439893737"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="253483684"/>
+							<reference key="NSNextKeyView" ref="21932035"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="88540079"/>
@@ -1870,11 +1883,11 @@
 				</object>
 				<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 			</object>
-			<object class="NSMenu" id="579948681">
+			<object class="NSMenu" id="166218919">
 				<string key="NSTitle">Search Menu</string>
 				<array class="NSMutableArray" key="NSMenuItems">
-					<object class="NSMenuItem" id="981533337">
-						<reference key="NSMenu" ref="579948681"/>
+					<object class="NSMenuItem" id="75790666">
+						<reference key="NSMenu" ref="166218919"/>
 						<string key="NSTitle">Title</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -1882,8 +1895,8 @@
 						<reference key="NSMixedImage" ref="502551668"/>
 						<int key="NSTag">1</int>
 					</object>
-					<object class="NSMenuItem" id="638198089">
-						<reference key="NSMenu" ref="579948681"/>
+					<object class="NSMenuItem" id="883868043">
+						<reference key="NSMenu" ref="166218919"/>
 						<string key="NSTitle">Album</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -1891,8 +1904,8 @@
 						<reference key="NSMixedImage" ref="502551668"/>
 						<int key="NSTag">2</int>
 					</object>
-					<object class="NSMenuItem" id="631754570">
-						<reference key="NSMenu" ref="579948681"/>
+					<object class="NSMenuItem" id="161324563">
+						<reference key="NSMenu" ref="166218919"/>
 						<string key="NSTitle">Artist</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -1900,8 +1913,8 @@
 						<reference key="NSMixedImage" ref="502551668"/>
 						<int key="NSTag">3</int>
 					</object>
-					<object class="NSMenuItem" id="557968438">
-						<reference key="NSMenu" ref="579948681"/>
+					<object class="NSMenuItem" id="359112167">
+						<reference key="NSMenu" ref="166218919"/>
 						<string key="NSTitle">All</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
@@ -2685,7 +2698,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setSearchCategoryFrom:</string>
 						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="981533337"/>
+						<reference key="destination" ref="75790666"/>
 					</object>
 					<int key="connectionID">666</int>
 				</object>
@@ -2693,7 +2706,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setSearchCategoryFrom:</string>
 						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="638198089"/>
+						<reference key="destination" ref="883868043"/>
 					</object>
 					<int key="connectionID">667</int>
 				</object>
@@ -2701,7 +2714,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setSearchCategoryFrom:</string>
 						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="631754570"/>
+						<reference key="destination" ref="161324563"/>
 					</object>
 					<int key="connectionID">668</int>
 				</object>
@@ -2709,7 +2722,7 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">setSearchCategoryFrom:</string>
 						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="557968438"/>
+						<reference key="destination" ref="359112167"/>
 					</object>
 					<int key="connectionID">670</int>
 				</object>
@@ -2733,7 +2746,7 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">searchMenuTemplate</string>
 						<reference key="source" ref="1017258984"/>
-						<reference key="destination" ref="579948681"/>
+						<reference key="destination" ref="166218919"/>
 					</object>
 					<int key="connectionID">665</int>
 				</object>
@@ -4435,34 +4448,34 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">661</int>
-						<reference key="object" ref="579948681"/>
+						<reference key="object" ref="166218919"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="638198089"/>
-							<reference ref="981533337"/>
-							<reference ref="631754570"/>
-							<reference ref="557968438"/>
+							<reference ref="883868043"/>
+							<reference ref="75790666"/>
+							<reference ref="161324563"/>
+							<reference ref="359112167"/>
 						</array>
 						<reference key="parent" ref="0"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">662</int>
-						<reference key="object" ref="981533337"/>
-						<reference key="parent" ref="579948681"/>
+						<reference key="object" ref="75790666"/>
+						<reference key="parent" ref="166218919"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">663</int>
-						<reference key="object" ref="638198089"/>
-						<reference key="parent" ref="579948681"/>
+						<reference key="object" ref="883868043"/>
+						<reference key="parent" ref="166218919"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">664</int>
-						<reference key="object" ref="631754570"/>
-						<reference key="parent" ref="579948681"/>
+						<reference key="object" ref="161324563"/>
+						<reference key="parent" ref="166218919"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">669</int>
-						<reference key="object" ref="557968438"/>
-						<reference key="parent" ref="579948681"/>
+						<reference key="object" ref="359112167"/>
+						<reference key="parent" ref="166218919"/>
 					</object>
 				</array>
 			</object>

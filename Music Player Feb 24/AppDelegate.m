@@ -16,13 +16,8 @@
 // ****TO DO: Sort? Sort by Album? by Rating?****
 // ****TO DO: Fix Search *****
 
-// Useful later:
-// mediaItem.contentRating
-// mediaItem.description
-// mediaItem.genre
-
-// TO DO: fix search (what do I want it to search anyways?)
 // TO DO: add sort, thinking those column arrow thingies?
+// Unchecked "Editable" in IB for each Column
 
 
 #import "AppDelegate.h"
@@ -91,9 +86,6 @@
     
     // Force progress indicator to "determinate"
     [self.indicator setIndeterminate:FALSE];
-    
-    // Set default search to Title which is tagged with "1"
-    //[self setSearchCategory:1];
         
 }
 
@@ -105,7 +97,8 @@
     [self stopUpdatingIndicator];
     
     // Set current index (due to play next/previous/continue)
-    if (cIndex == [self.arrayToDisplay count]) {
+    // Due to shuffle + search sometimes the index will be greater than the array
+    if (cIndex >= [self.arrayToDisplay count]) { 
         // We have hit the end & gone beyond, time to go back to zero
         self.currentIndex = 0;
     } else if (cIndex < 0) {
@@ -199,56 +192,27 @@
 
 - (IBAction)updateSearchResults:(id)sender { // "Searches Immediately" is checkmarked in the Attributes Inspector
     
-    // TO DO: Man I don't even want to touch this section...
-    // fix for array of media items instead of array of nsstrings
-    // fix for multiple columns in table view
-    
     NSString *searchString = [self.searchField stringValue]; // Grabbing the input text to search for
     NSPredicate *predicate;
     
     if ((searchString != nil) && (![searchString isEqualToString:@""])) {
         
-        // Want the last component in the string, rather than the path name
-        // NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.lastPathComponent contains[cd] %@", searchString];
-        // NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF.location.lastPathComponent contains[cd] %@", searchString];
-        
-        // Filter array & update table view
-        // self.searchResults = [self.myMusicArray filteredArrayUsingPredicate:predicate];
-        // self.arrayToDisplay = self.searchResults;
-        
-        /*if (self.searchCategory == 1) { // 1 should be Title
-            predicate = [NSPredicate predicateWithFormat:@"SELF.title contains[cd] %@", searchString];
-            // Filter array & update table view
-            self.searchResults = [self.myMusicArray filteredArrayUsingPredicate:predicate];
-            self.arrayToDisplay = self.searchResults;
-        }*/
-        
-        // NSString *itemString;
-        
         switch (self.searchCategory) {
             case 1: // Title Menu Item
-                // itemString = @"title";
                 predicate = [NSPredicate predicateWithFormat:@"SELF.title contains[cd] %@", searchString];
                 break;
             case 2: // Album Menu Item
-                // itemString = @"album.title";
                 predicate = [NSPredicate predicateWithFormat:@"SELF.album.title contains[cd] %@", searchString];
                 break;
             case 3: // Artist Menu Item
-                // itemString = @"artist.name";
                 predicate = [NSPredicate predicateWithFormat:@"SELF.artist.name contains[cd] %@", searchString];
                 break;
             case 0: // All Menu Item
-            default:
-                // NSLog(@"Oops, defaulted. Please select a Menu Item to search.");
+            default: // For when first start
                 predicate = [NSPredicate predicateWithFormat:@"(SELF.title contains[cd] %@) OR (SELF.album.title contains[cd] %@) OR (SELF.artist.name contains[cd] %@)", searchString, searchString, searchString];
-                
-                // NSArray *argArray = [NSArray arrayWithObjects:@"SELF.title", @"SELF.album.title", @"SELF.artist.name", nil];
-                // predicate = [NSPredicate predicateWithFormat:<#(NSString *)#> argumentArray:<#(NSArray *)#>]
                 break;
         }
         
-        // predicate = [NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF.%@ contains[cd] %%@", itemString], searchString];
         // Filter array & update table view
         self.searchResults = [self.myMusicArray filteredArrayUsingPredicate:predicate];
         self.arrayToDisplay = self.searchResults;
@@ -259,12 +223,16 @@
         
     }
     
+    if (self.myTable.sortDescriptors) { // Fix Sort when Searching, hack?
+        self.arrayToDisplay = [self.arrayToDisplay sortedArrayUsingDescriptors:self.myTable.sortDescriptors];
+    }
+    
     [self.myTable reloadData];
     [self updateTotalSongsButton];
     
 }
 
-- (IBAction)shuffleMusic:(id)sender {
+- (IBAction)shuffleMusic:(id)sender { // TO DO: NEED TO FIX RANDOM, ONLY RANDOM THE FIRST TIME
     
     // Set Button to "Push On Push Off" in IB
     if ([self.shuffleButton state]) {
@@ -346,6 +314,17 @@
     }
     
     return value;
+    
+}
+
+- (void)tableView:(NSTableView *)tableView sortDescriptorsDidChange:(NSArray *)oldDescriptors  {
+    // Each table column has a Sort Key and Selector defined in IB along with Order Ascending selected.
+    
+    NSArray *newDescriptors = tableView.sortDescriptors;
+    self.arrayToDisplay = [self.arrayToDisplay sortedArrayUsingDescriptors:newDescriptors];
+    // self.myMusicArray = [self.myMusicArray sortedArrayUsingDescriptors:newDescriptors];
+    // self.arrayToDisplay = self.myMusicArray;
+    [tableView reloadData];
     
 }
 
