@@ -271,14 +271,12 @@
 		3226C87116DB03720037C746 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Heather Ransome (GC2MR8X8ZZ)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks/;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Music Player Feb 24/Music Player Feb 24-Prefix.pch";
 				INFOPLIST_FILE = "Music Player Feb 24/Music Player Feb 24-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -286,14 +284,12 @@
 		3226C87216DB03720037C746 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Heather Ransome (GC2MR8X8ZZ)";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks/;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Music Player Feb 24/Music Player Feb 24-Prefix.pch";
 				INFOPLIST_FILE = "Music Player Feb 24/Music Player Feb 24-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

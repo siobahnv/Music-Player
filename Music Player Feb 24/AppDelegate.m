@@ -13,6 +13,7 @@
 // Potentially create a separate Music class
 // TO DO (Optional): There are probably duplicates in the array of songs, could try handling that? Fixed?
 // TO DO (Optional): Playlists?
+// ****TO DO: Fix Random Shuffle
 // To Do (Optional): Show & sort/filter by Ratings
 // To Do (Optional): Fix search box to stretch & shrink with window
 
@@ -30,10 +31,11 @@
     // Went to Project in the left bar > Targets > Build Phases > Link Binary with Libraries > + > Add Other > Shift+Cmd+G > /Library/Frameworks > iTunesLibrary.frameworks
     // #2: But that was not enough, needed to do this as well for it to Build
     // Build Settings > search for "Framework Search Paths" > doubleclick on the empty row, hit plus, and add /Library/Frameworks/
-    // #3: Also need to be code signed
+    // #3: Also need to be code signed (used Zach's team membership & set to Mac Developer)
     
     NSError *error = nil;
     ITLibrary *library = [ITLibrary libraryWithAPIVersion:@"1.0" error:&error];
+    // ISSUE: Code-signing, "ad hoc" option not showing
     
     if (library) {
         
@@ -93,7 +95,7 @@
     
     // If Shuffle is Turned on, Need to play with the Index
     if (self.shuffleMode) {
-        cIndex = arc4random_uniform((unsigned int)self.arrayToDisplay.count);
+        cIndex = arc4random_uniform(self.arrayToDisplay.count);
     }
     
     // Set current index (due to play next/previous/continue)
@@ -115,9 +117,6 @@
     // Continuation of HACKS! since mediaItem.location is returning nil, we're going to search for the property
     if (!mediaURL) {
         mediaURL = [mediaItem valueForProperty:@"Location"]; // but if it doesn't, fall back to querying the property directly
-        if (!mediaURL) {
-            mediaURL = [mediaItem valueForKey:@"_URL"]; // amazingly, they broke THAT too. So, KVC the private property out of it. $&*#%^
-        }
     }
     
     self.ourBeats = [[NSSound alloc] initWithContentsOfURL:mediaURL byReference:YES];
@@ -249,9 +248,13 @@
     
 }
 
-- (IBAction)shuffleMusic:(id)sender {
+- (IBAction)shuffleMusic:(id)sender { // TO DO: NEED TO FIX RANDOM, ONLY RANDOM THE FIRST TIME
     
     // Set Button to "Push On Push Off" in IB
+    
+    // if ([self.shuffleButton state]) {
+    //     self.currentIndex = arc4random_uniform(self.arrayToDisplay.count);
+    // }
     
     if ([self.shuffleButton state]) {
         self.shuffleMode = TRUE;
